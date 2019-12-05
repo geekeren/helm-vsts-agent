@@ -1,0 +1,34 @@
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: docker-cleaner
+spec:
+  selector:
+    matchLabels:
+      app: docker-cleaner
+  template:
+    metadata:
+      labels:
+        app: docker-cleaner
+    spec:
+      volumes:
+        - name: dockersocket
+          hostPath:
+            path: /var/run/docker.sock
+      containers:
+      - name: docker-cleaner
+        image: bywang/docker-cleaner
+        imagePullPolicy: Always
+        env:
+        - name: CLEAN_INTERVAL
+          value: "3600"
+        - name: CLEAN_FILTER
+          value: "until=72h"
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+        volumeMounts:
+          - name: dockersocket
+            mountPath: /var/run/docker.sock

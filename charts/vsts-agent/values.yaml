@@ -2,18 +2,18 @@ replicas: 3
 
 image:
   repository: microsoft/vsts-agent
-  tag: latest
+  tag: ubuntu-16.04-docker-18.06.1-ce-standard
   pullPolicy: Always
 
 resources:
   limits:
-    cpu: 4
+    cpu: 2
     memory: 8Gi
   requests:
-    cpu: 4
-    memory: 8Gi
+    cpu: 500m
+    memory: 1Gi
   disk: "50Gi"
-  storageclass: "default"
+  storageclass: "managed-premium"
 
 cleanRun: false
 

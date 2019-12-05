@@ -17,6 +17,18 @@ spec:
       labels:
         app: {{ .Chart.Name }}
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Chart.Name }}
+              topologyKey: kubernetes.io/hostname
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -25,7 +37,7 @@ spec:
           - name: VSTS_TOKEN
             valueFrom:
               secretKeyRef:
-                name: vsts-agent-secret
+                name: "{{ .Chart.Name}}-secret"
                 key: vstsToken
          {{- with .Values }}
           - name: VSTS_ACCOUNT
@@ -42,7 +54,7 @@ spec:
             value: {{ $value | quote }}
          {{- end }}
         volumeMounts:
-          - name: workspace
+          - name: agent-workspace
             mountPath: {{ .Values.vstsWorkspace | default "/workspace" }}
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | indent 10 }}
@@ -75,7 +87,7 @@ spec:
 {{ end }}
   volumeClaimTemplates:
   - metadata:
-      name: workspace
+      name: agent-workspace
     spec:
       accessModes: [ ReadWriteOnce ]
       storageClassName: {{ .Values.resources.storageclass | default "default" | quote }}
