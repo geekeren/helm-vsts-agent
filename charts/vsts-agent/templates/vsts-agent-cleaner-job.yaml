@@ -3,6 +3,7 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: docker-cleaner
+  namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:
@@ -22,9 +23,9 @@ spec:
         imagePullPolicy: Always
         env:
         - name: CLEAN_INTERVAL
-          value: "3600"
+          value: "{{ .Values.dockerCleaner.clean_interval }}"
         - name: CLEAN_FILTER
-          value: "until=72h"
+          value: {{ .Values.dockerCleaner.clean_filter }}
         resources:
           requests:
             cpu: 10m
